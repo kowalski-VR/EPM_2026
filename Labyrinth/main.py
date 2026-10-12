@@ -48,14 +48,17 @@ def main():
     ev3.speaker.beep()
     wait(500)
 
+    for i in range(1,10000):
+        fahren_wand(geschwindigkeit, motorL, motorR, UltrasonicSensor)
+
 
     # fahren_gerade(geschwindigkeit, motorL, motorR)
     # wait(200)
     # stop(motorL, motorR)
 
-    drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, 1)
-    wait(1000)
-    drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, 1)
+    # drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, 1)
+    # wait(1000)
+    # drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, 1)
     
     
     # Signal - Ziel erreicht
