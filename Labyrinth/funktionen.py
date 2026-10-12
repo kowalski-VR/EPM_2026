@@ -1,6 +1,6 @@
 # Hier werden die erforderlichen Software-Module importiert.
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, GyroSensor)
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, GyroSensor, UltrasonicSensor)
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.media.ev3dev import SoundFile, ImageFile
 from pybricks.parameters import Port, Stop, Direction, Button, Color
@@ -12,15 +12,15 @@ import time
 # Fahren (geradeaus)
 # ==================
 # für alternative Ansätze: README Abschnitt 5.4 Gerades Fahren
-def fahren_gerade(speed: int, motorL:Motor, motorR:Motor):
+def fahren_gerade(geschwindigkeit: int, motorL:Motor, motorR:Motor):
     """ Drehen der Motoren mit einer konstanten Geschwindigkeit.
 
     Args:
             motorL (Motor): Linker Motor
             motorR (Motor): Rechter Motor
     """
-    motorL.run(speed)
-    motorR.run(speed)
+    motorL.run(geschwindigkeit)
+    motorR.run(geschwindigkeit)
 
 
 
@@ -98,9 +98,33 @@ def drehen_gyro_reglerbasiert(motorL:Motor, motorR:Motor, gyro_sensor:GyroSensor
 
 
 
-# ==============================
-#  Methode zum Prüfen der Farben
-# ==============================
+# ====================================
+# Fahren mit Abstandsregelung zur Wand
+# ====================================
+def fahren_wand(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:UltrasonicSensor):
+    sollabstand = 100
+    verstaerkung = 10
+
+    wandabstand = abstandssensor.distance()
+
+    motorL.run(min(geschwindigkeit, geschwindigkeit - (verstaerkung * (sollabstand - wandabstand))))
+    motorR.run(min(geschwindigkeit, geschwindigkeit - (verstaerkung * (sollabstand - wandabstand))))
+
+
+
+
+# ====================
+# Labyrinth bewältigen
+# ====================
+def labyrinth():
+    pass
+
+
+
+
+# =============================
+# Methode zum Prüfen der Farben
+# =============================
 def farbtest(farbsensor:ColorSensor, tastsensor:TouchSensor, ev3:EV3Brick):
     """ Manuelle Methode zum Erfahren der aktuellen Referenzwerte 
         sowie zum Prüfen der Farbscan-Funktion
