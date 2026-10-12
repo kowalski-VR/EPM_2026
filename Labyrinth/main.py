@@ -14,10 +14,10 @@ from funktionen import *
 
 # Hardware einrichten
 ev3 = EV3Brick()
-tastsensor = TouchSensor(Port.S1)
+tastsensor = TouchSensor(Port.S4)
 abstandssensor = UltrasonicSensor(Port.S2)
 gyro_sensor  = GyroSensor(Port.S3)
-farbsensor = ColorSensor(Port.S4)
+farbsensor = ColorSensor(Port.S1)
 motorR = Motor(Port.B)
 motorL = Motor(Port.C)
 
@@ -34,23 +34,24 @@ geschwindigkeit = 500   # "Mastergeschwindigkeit" - alle nötigen Größen skali
 def main(): 
     """Hauptfunktion
     """
-    # Ready Check - Roboter ist bereit
-    ev3.speaker.beep()
+    # # Ready Check - Roboter ist bereit
+    # ev3.speaker.beep()
 
-    # Startvorgang
-    while not tastsensor.pressed():
-        pass
-    while tastsensor.pressed():
-        pass
-    
-    ev3.screen.print("Start")
-    print("Start")
-    ev3.speaker.beep()
+    # # Startvorgang
+    # while not tastsensor.pressed():
+    #     pass
+    # while tastsensor.pressed():
+    #     pass
+    # ev3.speaker.beep()
+
     wait(500)
 
-    for i in range(1,10000):
-        fahren_wand(geschwindigkeit, motorL, motorR, UltrasonicSensor)
+    labyrinth(geschwindigkeit, motorL, motorR, abstandssensor, tastsensor, gyro_sensor, farbsensor)
 
+    # while (not tastsensor.pressed()) and (abstandssensor.distance() < 300):
+    #     fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)
+    #     wait(10)
+    # stop(motorL, motorR)
 
     # fahren_gerade(geschwindigkeit, motorL, motorR)
     # wait(200)

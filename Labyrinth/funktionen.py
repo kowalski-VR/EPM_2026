@@ -102,13 +102,22 @@ def drehen_gyro_reglerbasiert(motorL:Motor, motorR:Motor, gyro_sensor:GyroSensor
 # Fahren mit Abstandsregelung zur Wand
 # ====================================
 def fahren_wand(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:UltrasonicSensor):
+    """_summary_
+
+    Args:
+        geschwindigkeit (int): _description_
+        motorL (Motor): _description_
+        motorR (Motor): _description_
+        abstandssensor (UltrasonicSensor): _description_
+    """
     sollabstand = 100
-    verstaerkung = 10
+    verstaerkung = 1.6  
 
     wandabstand = abstandssensor.distance()
+    fehler = sollabstand - wandabstand
 
-    motorL.run(min(geschwindigkeit, geschwindigkeit - (verstaerkung * (sollabstand - wandabstand))))
-    motorR.run(min(geschwindigkeit, geschwindigkeit - (verstaerkung * (sollabstand - wandabstand))))
+    motorL.run(geschwindigkeit - verstaerkung * fehler)
+    motorR.run(geschwindigkeit + verstaerkung * fehler)
 
 
 
@@ -116,8 +125,54 @@ def fahren_wand(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:
 # ====================
 # Labyrinth bewältigen
 # ====================
-def labyrinth():
-    pass
+def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:UltrasonicSensor, tastsensor:TouchSensor, gyro_sensor:GyroSensor, farbsensor:ColorSensor):
+    """_summary_
+
+    Args:
+        motorL (Motor): _description_
+        motorR (Motor): _description_
+        abstandssensor (UltrasonicSensor): _description_
+        tastsensor (TouchSensor): _description_
+        gyro_sensor (GyroSensor): _description_
+    """
+
+    gangabstand = 300
+
+    while True:
+        # Farbsensor erkennt schwarz -> Ziel erreicht
+        if farbsensor.color == Color.BLACK:
+            stop(motorL, motorR)
+            break
+
+        # Tastsensor ausgelöst -> Wand vorne
+        if tastsensor.pressed():
+            stop(motorL, motorR)
+            wait(50)
+
+            fahren_gerade(-geschwindigkeit, motorL, motorR)
+            wait(100)
+            stop(motorL, motorR)
+
+            drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, -1)
+
+            fahren_gerade(geschwindigkeit, motorL, motorR)
+            wait(200)
+
+        wandabstand = abstandssensor.distance()
+
+        # Hoher Wandabstand -> Rechts Wandeinbruch
+        if wandabstand > gangabstand:
+            fahren_gerade(-geschwindigkeit, motorL, motorR)
+            wait(100)
+            stop(motorL, motorR)
+
+            drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, +1)
+            
+            fahren_gerade(geschwindigkeit, motorL, motorR)
+            wait(200)
+
+        fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)
+
 
 
 
