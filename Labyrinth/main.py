@@ -34,17 +34,20 @@ geschwindigkeit = 500   # "Mastergeschwindigkeit" - alle nötigen Größen skali
 def main(): 
     """Hauptfunktion
     """
-    # # Ready Check - Roboter ist bereit
-    # ev3.speaker.beep()
+    # Ready Check - Roboter ist bereit
+    ev3.speaker.beep()
 
-    # # Startvorgang
-    # while not tastsensor.pressed():
-    #     pass
-    # while tastsensor.pressed():
-    #     pass
-    # ev3.speaker.beep()
+    # Startvorgang
+    while not tastsensor.pressed():
+        pass
+    while tastsensor.pressed():
+        pass
+    ev3.speaker.beep()
 
     wait(500)
+
+    drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, -1)
+    wait(100)
 
     labyrinth(geschwindigkeit, motorL, motorR, abstandssensor, tastsensor, gyro_sensor, farbsensor)
 

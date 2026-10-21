@@ -136,42 +136,46 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
         gyro_sensor (GyroSensor): _description_
     """
 
-    gangabstand = 300
+    gangabstand = 125
 
     while True:
+        wait(50)
         # Farbsensor erkennt schwarz -> Ziel erreicht
-        if farbsensor.color == Color.BLACK:
+        rgb = farbsensor.rgb()
+        if rgb[0] < 20 and rgb[1] < 20 and rgb[2] < 20:
+            print(rgb)
             stop(motorL, motorR)
             break
 
         # Tastsensor ausgelöst -> Wand vorne
         if tastsensor.pressed():
             stop(motorL, motorR)
-            wait(50)
+            wait(100)
 
             fahren_gerade(-geschwindigkeit, motorL, motorR)
-            wait(100)
+            wait(750)
             stop(motorL, motorR)
+            wait(100)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, -1)
-
-            fahren_gerade(geschwindigkeit, motorL, motorR)
-            wait(200)
+            wait(100)
 
         wandabstand = abstandssensor.distance()
 
         # Hoher Wandabstand -> Rechts Wandeinbruch
         if wandabstand > gangabstand:
-            fahren_gerade(-geschwindigkeit, motorL, motorR)
-            wait(100)
+            fahren_gerade(geschwindigkeit, motorL, motorR)
+            wait(1400)
             stop(motorL, motorR)
+            wait(100)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, +1)
+            wait(100)
             
             fahren_gerade(geschwindigkeit, motorL, motorR)
-            wait(200)
-
-        fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)
+            wait(1000)
+        else:
+            fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)
 
 
 
