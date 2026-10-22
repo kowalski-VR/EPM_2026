@@ -7,7 +7,7 @@ from pybricks.parameters import Port, Stop, Direction, Button, Color
 import time
 import math
 
-
+# ein Feld = 30 cm
 
 # ==================
 # Fahren (geradeaus)
@@ -111,7 +111,7 @@ def fahren_wand(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:
         motorR (Motor): _description_
         abstandssensor (UltrasonicSensor): _description_
     """
-    sollabstand = 100
+    sollabstand = 90
     verstaerkung = 1.6  
 
     wandabstand = abstandssensor.distance()
@@ -136,7 +136,7 @@ def fahren_gerade_distanz(geschwindigkeit:int, motorR:Motor, motorL:Motor, dista
     # distanz = 2 * pi * r * drehwinkel/360°        # in [cm]
 
     # Dabei ist r der Radius des Rades r = d/2 - Raddurchmesser = 5,5 cm
-    r = 5.5 / 2                                     # in [cm]
+    r = 3 / 2                                     # in [cm]
 
     # Umstellen der Distanzgleichung nach dem Drehwinkel
     # drehwinkel = distanz * 350° / (2 * pi * r)
@@ -180,29 +180,29 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
             stop(motorL, motorR)
             wait(100)
 
-            fahren_gerade_distanz(-geschwindigkeit, motorR, motorL, 10)
+            fahren_gerade_distanz(-geschwindigkeit, motorR, motorL, 6.5)
             # fahren_gerade(-geschwindigkeit, motorL, motorR)
             # wait(750)
             # stop(motorL, motorR)
-            wait(100)
+            wait(50)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, -1)
-            wait(100)
+            wait(50)
 
         wandabstand = abstandssensor.distance()
 
         # Hoher Wandabstand -> Rechts Wandeinbruch
         if wandabstand > gangabstand:
-            fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 10)
+            fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 16.2)
             # fahren_gerade(geschwindigkeit, motorL, motorR)
             # wait(1400)
             # stop(motorL, motorR)
-            wait(100)
+            wait(50)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, +1)
-            wait(100)
+            wait(50)
 
-            fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 10)
+            fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 13)
             # fahren_gerade(geschwindigkeit, motorL, motorR)
             # wait(1000)
         else:
