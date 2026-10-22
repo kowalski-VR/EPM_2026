@@ -5,6 +5,7 @@ from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.media.ev3dev import SoundFile, ImageFile
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 import time
+import math
 
 
 
@@ -121,6 +122,33 @@ def fahren_wand(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:
 
 
 
+def fahren_gerade_distanz(geschwindigkeit:int, motorR:Motor, motorL:Motor, distanz:float):
+    """ Gerades Fahren über eine feste Distanz - ansteuern der Motoren mit: .run_angle(speed, rotation_angle, then=Stop.HOLD, wait=True)
+        Dreht den Motor mit einer konstanten Geschwindigkeit um einen bestimmten Winkel
+
+    Args:
+        geschwindigkeit (int): Vorgabegeschwindigkeit für den Motor des Roboters in Grad/s
+        motorR (Motor): Rechter Motor
+        motorL (Motor): Linker Motor
+        distanz (float): Fahrdistanz in cm 
+    """
+    # Die Fahrdistanz leitet sich aus dem Kreisumfang ab
+    # distanz = 2 * pi * r * drehwinkel/360°        # in [cm]
+
+    # Dabei ist r der Radius des Rades r = d/2 - Raddurchmesser = 5,5 cm
+    r = 5.5 / 2                                     # in [cm]
+
+    # Umstellen der Distanzgleichung nach dem Drehwinkel
+    # drehwinkel = distanz * 350° / (2 * pi * r)
+    drehwinkel = distanz * 360 / (2 * math.pi * r)  # in [°]
+
+    # Bewegen der Motoren um den gewünschten Winkel
+    # beim 1. Befehl wait = False, damit nicht gewartet wird bis der Befehl abgeschlossen wird und gleich der nächste begonnen wird
+    motorR.run_angle(geschwindigkeit, drehwinkel, wait=False)
+    motorL.run_angle(geschwindigkeit, drehwinkel)
+
+
+
 
 # ====================
 # Labyrinth bewältigen
@@ -152,9 +180,10 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
             stop(motorL, motorR)
             wait(100)
 
-            fahren_gerade(-geschwindigkeit, motorL, motorR)
-            wait(750)
-            stop(motorL, motorR)
+            fahren_gerade_distanz(-geschwindigkeit, motorR, motorL, 10)
+            # fahren_gerade(-geschwindigkeit, motorL, motorR)
+            # wait(750)
+            # stop(motorL, motorR)
             wait(100)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, -1)
@@ -164,16 +193,18 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
 
         # Hoher Wandabstand -> Rechts Wandeinbruch
         if wandabstand > gangabstand:
-            fahren_gerade(geschwindigkeit, motorL, motorR)
-            wait(1400)
-            stop(motorL, motorR)
+            fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 10)
+            # fahren_gerade(geschwindigkeit, motorL, motorR)
+            # wait(1400)
+            # stop(motorL, motorR)
             wait(100)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, +1)
             wait(100)
-            
-            fahren_gerade(geschwindigkeit, motorL, motorR)
-            wait(1000)
+
+            fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 10)
+            # fahren_gerade(geschwindigkeit, motorL, motorR)
+            # wait(1000)
         else:
             fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)
 
