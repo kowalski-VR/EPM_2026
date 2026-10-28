@@ -20,6 +20,7 @@ gyro_sensor  = GyroSensor(Port.S3)
 farbsensor = ColorSensor(Port.S1)
 motorR = Motor(Port.B)
 motorL = Motor(Port.C)
+motorFlagge = Motor(Port.D)
 
 
 
@@ -49,7 +50,7 @@ def main():
     drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, -1)
     wait(100)
 
-    labyrinth(geschwindigkeit, motorL, motorR, abstandssensor, tastsensor, gyro_sensor, farbsensor)
+    labyrinth(geschwindigkeit, motorL, motorR, motorFlagge, abstandssensor, tastsensor, gyro_sensor, farbsensor)
 
     # while (not tastsensor.pressed()) and (abstandssensor.distance() < 300):
     #     fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)

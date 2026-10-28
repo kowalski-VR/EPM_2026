@@ -144,8 +144,17 @@ def fahren_gerade_distanz(geschwindigkeit:int, motorR:Motor, motorL:Motor, dista
 
     # Bewegen der Motoren um den gewünschten Winkel
     # beim 1. Befehl wait = False, damit nicht gewartet wird bis der Befehl abgeschlossen wird und gleich der nächste begonnen wird
-    motorR.run_angle(geschwindigkeit, drehwinkel, wait=False)
-    motorL.run_angle(geschwindigkeit, drehwinkel)
+    motorR.run_angle(geschwindigkeit, drehwinkel, then=Stop.COAST, wait=False)
+    motorL.run_angle(geschwindigkeit, drehwinkel, then=Stop.COAST)
+
+
+
+
+# ====================
+# Flagge fallen lassen
+# ====================
+def flagge(drehwinkel:int, motorFlagge:Motor):
+    motorFlagge.run_angle(300, drehwinkel)
 
 
 
@@ -153,7 +162,7 @@ def fahren_gerade_distanz(geschwindigkeit:int, motorR:Motor, motorL:Motor, dista
 # ====================
 # Labyrinth bewältigen
 # ====================
-def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:UltrasonicSensor, tastsensor:TouchSensor, gyro_sensor:GyroSensor, farbsensor:ColorSensor):
+def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, motorFlagge:Motor, abstandssensor:UltrasonicSensor, tastsensor:TouchSensor, gyro_sensor:GyroSensor, farbsensor:ColorSensor):
     """_summary_
 
     Args:
@@ -165,12 +174,13 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
     """
 
     gangabstand = 125
+    flaggenzaehler = 0
 
     while True:
         wait(50)
         # Farbsensor erkennt schwarz -> Ziel erreicht
         rgb = farbsensor.rgb()
-        if rgb[0] < 20 and rgb[1] < 20 and rgb[2] < 20:
+        if rgb[0] < 17 and rgb[1] < 17 and rgb[2] < 17:
             print(rgb)
             stop(motorL, motorR)
             break
@@ -183,11 +193,23 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
             fahren_gerade_distanz(-geschwindigkeit, motorR, motorL, 6.5)
             # fahren_gerade(-geschwindigkeit, motorL, motorR)
             # wait(750)
-            # stop(motorL, motorR)
+            stop(motorL, motorR)
             wait(50)
 
-            drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, -1)
+            drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, -1)
             wait(50)
+
+            # Sackgasse
+            if abstandssensor.distance() < gangabstand:
+                flaggenzaehler += 1
+                flagge(90, motorFlagge)
+                if flaggenzaehler == 2:
+                    flagge(-180, motorFlagge)
+            # keine Sackgasse - rechte Wand frei
+            else:
+                drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, -90, -1)
+                wait(50)
+    
 
         wandabstand = abstandssensor.distance()
 
@@ -196,7 +218,7 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:Ul
             fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 16.2)
             # fahren_gerade(geschwindigkeit, motorL, motorR)
             # wait(1400)
-            # stop(motorL, motorR)
+            stop(motorL, motorR)
             wait(50)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, +1)
