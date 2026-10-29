@@ -66,7 +66,7 @@ def drehen_gyro_reglerbasiert(motorL:Motor, motorR:Motor, gyro_sensor:GyroSensor
     # Maximale Geschwindigkeitsänderung pro Schleifendurchlauf / Gradientenbegrenzung
     v_diff_max = 10 # [Grad/s]
     # Zulässige Winkelabweichung
-    toleranz = 1 # [Grad]
+    toleranz = 2 # [Grad]
     # Geschwindigkeit des vorherigen Schleifendurchlaufs
     v_vor = 0 # [Grad/s]
 
@@ -111,6 +111,7 @@ def fahren_wand(geschwindigkeit:int, motorL:Motor, motorR:Motor, abstandssensor:
         motorR (Motor): _description_
         abstandssensor (UltrasonicSensor): _description_
     """
+    # ca. 9 cm ausgemessen, damit der Roboter mittig im Feld fährt
     sollabstand = 90
     verstaerkung = 1.6  
 
@@ -144,8 +145,11 @@ def fahren_gerade_distanz(geschwindigkeit:int, motorR:Motor, motorL:Motor, dista
 
     # Bewegen der Motoren um den gewünschten Winkel
     # beim 1. Befehl wait = False, damit nicht gewartet wird bis der Befehl abgeschlossen wird und gleich der nächste begonnen wird
-    motorR.run_angle(geschwindigkeit, drehwinkel, then=Stop.COAST, wait=False)
-    motorL.run_angle(geschwindigkeit, drehwinkel, then=Stop.COAST)
+    motorR.run_angle(geschwindigkeit, drehwinkel, wait=False)
+    motorL.run_angle(geschwindigkeit, drehwinkel)
+    
+    # motorR.run_angle(geschwindigkeit, drehwinkel, then=Stop.COAST, wait=False)
+    # motorL.run_angle(geschwindigkeit, drehwinkel, then=Stop.COAST)
 
 
 
@@ -190,24 +194,31 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, motorFlagge:Motor
             stop(motorL, motorR)
             wait(100)
 
-            fahren_gerade_distanz(-geschwindigkeit, motorR, motorL, 6.5)
+            # Zurückfahren, damit der Roboter wieder mittig im Feld steht
+            # Ausgemessen ca.: 6,5 cm
+            fahren_gerade_distanz(-geschwindigkeit, motorR, motorL, 6.6)
             # fahren_gerade(-geschwindigkeit, motorL, motorR)
             # wait(750)
-            stop(motorL, motorR)
+            # stop(motorL, motorR)
             wait(50)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 180, -1)
             wait(50)
 
+            wandabstand = abstandssensor.distance()
+            print(wandabstand)
+
             # Sackgasse
-            if abstandssensor.distance() < gangabstand:
+            if wandabstand < gangabstand:
                 flaggenzaehler += 1
                 flagge(90, motorFlagge)
                 if flaggenzaehler == 2:
                     flagge(-180, motorFlagge)
             # keine Sackgasse - rechte Wand frei
             else:
-                drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, -90, -1)
+                print("keine Sackgasse - rechte Wand frei")
+                drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, 1)
+                
                 wait(50)
     
 
@@ -218,7 +229,7 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, motorFlagge:Motor
             fahren_gerade_distanz(geschwindigkeit, motorR, motorL, 16.2)
             # fahren_gerade(geschwindigkeit, motorL, motorR)
             # wait(1400)
-            stop(motorL, motorR)
+            # stop(motorL, motorR)
             wait(50)
 
             drehen_gyro_reglerbasiert(motorL, motorR, gyro_sensor, 90, +1)
@@ -229,6 +240,9 @@ def labyrinth(geschwindigkeit:int, motorL:Motor, motorR:Motor, motorFlagge:Motor
             # wait(1000)
         else:
             fahren_wand(geschwindigkeit, motorL, motorR, abstandssensor)
+
+    if flaggenzaehler == 1:
+        flagge(-90, motorFlagge)
 
 
 
