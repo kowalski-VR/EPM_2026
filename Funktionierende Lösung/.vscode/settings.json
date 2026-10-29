@@ -1,0 +1,19 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+	"files.eol": "\n",
+	"debug.openDebug": "neverOpen",
+	"python.linting.enabled": false,
+	"python.languageServer": "Pylance",
+	"ev3dev.browser.upload.exclude": [
+        "**/*.md",
+        "**/images/**",
+        "**/.git/**",
+        "**/.gitignore",
+        "LICENSE"
+    ]
+}
+
+// Files ausschließen:
+// 1. Drücken: Ctrl + Shift + P
+// 2. Auswählen: Preferences: Open User Settings (JSON)
+// 3. Einfügen: "ev3devBrowser.download.exclude": "**/*.{md,png,jpg,svg,gitignore,pdf}"
